@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Генератор оправданий</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .card {
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+        color: #1e293b;
+    }
+
+    p {
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+
+    .box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    input[type="range"] {
+        width: 100%;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #4f46e5;
+        cursor: pointer;
+    }
+
+    .oracle-btn {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(135deg, #6366f1, #9333ea);
+        color: white;
+        font-size: 32px;
+        transition: transform 0.3s;
+    }
+
+    .oracle-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .oracle-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .excuse {
+        font-size: 18px;
+        color: #1e293b;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .reset {
+        background: none;
+        border: none;
+        color: #475569;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .reset:hover {
+        color: #1e293b;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>Генератор оправданий</h1>
+    <p>Нажми на оракул и получи оправдание</p>
+
+    <div class="box">
+        <div class="row">
+            <span>Правдоподобность</span>
+            <strong><span id="credValue">50</span>%</strong>
+        </div>
+        <input type="range" min="1" max="99" value="50" id="credibility">
+        <div class="row" style="font-size:12px;color:#94a3b8;">
+            <span>Абсурд</span>
+            <span>Реальность</span>
+        </div>
+    </div>
+
+    <button id="oracle" class="oracle-btn">✨</button>
+
+    <div id="loading" style="display:none; margin-top:10px;">Генерирую…</div>
+
+    <div id="excuseBox" class="box" style="display:none;">
+        <p class="excuse" id="excuseText"></p>
+    </div>
+
+    <button id="reset" class="reset" style="display:none;">🔄 Сгенерировать новое</button>
+
+    <p style="font-size:12px;margin-top:20px;">Используй ответственно 😌</p>
+</div>
+
+<script>
+const low = [
+    "Меня задержал говорящий голубь",
+    "Поймал метеорит в огороде",
+    "Соседка украла мою тапочку",
+    "Нашел дверь в параллельную вселенную",
+    "Меня похитили инопланетяне на 5 минут"
+];
+
+const medium = [
+    "Сломался лифт",
+    "Забыл выключить утюг",
+    "Пропал свет в подъезде",
+    "Потерял ключи",
+    "Застрял в навигаторе"
+];
+
+const high = [
+    "Задержался на работе",
+    "Пробки на дорогах",
+    "Плохое самочувствие",
+    "Технические неполадки",
+    "Семейные обстоятельства"
+];
+
+const slider = document.getElementById('credibility');
+const credValue = document.getElementById('credValue');
+const oracle = document.getElementById('oracle');
+const loading = document.getElementById('loading');
+const excuseBox = document.getElementById('excuseBox');
+const excuseText = document.getElementById('excuseText');
+const reset = document.getElementById('reset');
+
+slider.oninput = () => credValue.textContent = slider.value;
+
+oracle.onclick = () => {
+    oracle.disabled = true;
+    loading.style.display = 'block';
+    excuseBox.style.display = 'none';
+
+    setTimeout(() => {
+        let pool =
+            slider.value < 30 ? low :
+            slider.value < 70 ? medium : high;
+
+        excuseText.textContent = `"${pool[Math.floor(Math.random() * pool.length)]}"`;
+        excuseBox.style.display = 'block';
+        reset.style.display = 'inline';
+        loading.style.display = 'none';
+        oracle.disabled = false;
+    }, 800);
+};
+
+reset.onclick = () => {
+    excuseBox.style.display = 'none';
+    reset.style.display = 'none';
+};
+</script>
+
+</body>
+</html>
