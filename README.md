@@ -1,0 +1,2 @@
+# GenerationHappySite
+Генерация оправданий
