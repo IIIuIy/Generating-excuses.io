@@ -1,202 +1,114 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Генератор оправданий — оракул подберёт веский довод на любой случай.">
+<meta name="color-scheme" content="light dark">
 <title>Генератор оправданий</title>
-
-<style>
-    body {
-        margin: 0;
-        font-family: system-ui, -apple-system, sans-serif;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-    }
-
-    .card {
-        max-width: 420px;
-        width: 100%;
-        text-align: center;
-    }
-
-    h1 {
-        font-size: 28px;
-        margin-bottom: 8px;
-        color: #1e293b;
-    }
-
-    p {
-        color: #64748b;
-        margin-bottom: 24px;
-    }
-
-    .box {
-        background: #fff;
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 14px;
-    }
-
-    input[type="range"] {
-        width: 100%;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #4f46e5;
-        cursor: pointer;
-    }
-
-    .oracle-btn {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        background: linear-gradient(135deg, #6366f1, #9333ea);
-        color: white;
-        font-size: 32px;
-        transition: transform 0.3s;
-    }
-
-    .oracle-btn:hover {
-        transform: scale(1.05);
-    }
-
-    .oracle-btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .excuse {
-        font-size: 18px;
-        color: #1e293b;
-        animation: fadeIn 0.5s ease;
-    }
-
-    .reset {
-        background: none;
-        border: none;
-        color: #475569;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-
-    .reset:hover {
-        color: #1e293b;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
+<link rel="stylesheet" href="styles.css">
+<script src="logic.js" defer></script>
+<script src="app.js" defer></script>
 </head>
-
 <body>
-
-<div class="card">
-    <h1>Генератор оправданий</h1>
-    <p>Нажми на оракул и получи оправдание</p>
-
-    <div class="box">
-        <div class="row">
-            <span>Правдоподобность</span>
-            <strong><span id="credValue">50</span>%</strong>
-        </div>
-        <input type="range" min="1" max="99" value="50" id="credibility">
-        <div class="row" style="font-size:12px;color:#94a3b8;">
-            <span>Абсурд</span>
-            <span>Реальность</span>
-        </div>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div>
+        <h1>Генератор оправданий</h1>
+        <p>Оракул подберёт веский довод на любой случай</p>
+      </div>
     </div>
+    <div class="tools">
+      <button class="icon-btn" id="soundBtn" aria-label="Выключить звук" title="Звук">🔊</button>
+      <button class="icon-btn" id="themeBtn" aria-label="Включить тёмную тему" title="Тема">🌙</button>
+    </div>
+  </header>
 
-    <button id="oracle" class="oracle-btn">✨</button>
+  <main class="grid">
+    <!-- Параметры -->
+    <section class="panel" aria-label="Параметры генерации">
+      <h2>Параметры</h2>
+      <div class="cred">
+        <div class="cred-top">
+          <span>Правдоподобность</span>
+          <strong id="credValue">50%</strong>
+        </div>
+        <input type="range" id="credibility" min="1" max="100" value="50" aria-label="Правдоподобность оправдания">
+        <div class="ticks">
+          <span>Абсурд</span><span>Странное</span><span>Правдоподобное</span><span>Веское</span>
+        </div>
+        <div class="cred-actions">
+          <button class="btn ghost" id="randomCred" type="button">🎲 Случайно</button>
+          <span class="tier-hint" id="tierHint">🤔 Правдоподобное</span>
+        </div>
+      </div>
 
-    <div id="loading" style="display:none; margin-top:10px;">Генерирую…</div>
+      <label class="switch" for="detailed">
+        <input type="checkbox" id="detailed">
+        <span>Подробная версия (добавить деталь)</span>
+      </label>
 
-    <div id="excuseBox" class="box" style="display:none;">
+      <div class="oracle-wrap">
+        <button class="oracle" id="oracle" type="button" aria-label="Сгенерировать оправдание">✨</button>
+      </div>
+      <div class="loading" id="loading" hidden>Оракул думает<span class="dots"></span></div>
+      <p class="hint">Пробел — создать · C — копировать · F — избранное · T — тема</p>
+    </section>
+
+    <!-- Результат -->
+    <section class="panel result-panel" aria-label="Результат">
+      <div class="empty" id="empty">
+        <div class="big" aria-hidden="true">🔮</div>
+        <h3>Оракул ждёт</h3>
+        <p>Нажми на кнопку ✨ и получи оправдание</p>
+      </div>
+
+      <div class="result" id="result" hidden aria-live="polite">
+        <div class="result-head">
+          <span class="badge" id="tierBadge"></span>
+          <span class="time" id="resultTime"></span>
+        </div>
         <p class="excuse" id="excuseText"></p>
-    </div>
+        <div class="actions">
+          <button class="btn" id="copyBtn" type="button">📋 Копировать</button>
+          <button class="btn" id="favBtn" type="button">☆ В избранное</button>
+          <button class="btn" id="shareBtn" type="button">↗ Поделиться</button>
+          <button class="btn primary" id="againBtn" type="button">🔁 Ещё</button>
+        </div>
+      </div>
 
-    <button id="reset" class="reset" style="display:none;">🔄 Сгенерировать новое</button>
+      <div class="daily">
+        <h3>Оправдание дня 🎯</h3>
+        <p id="dailyText">—</p>
+        <button class="link-btn" id="dailyBtn" type="button">Использовать это оправдание →</button>
+      </div>
+    </section>
 
-    <p style="font-size:12px;margin-top:20px;">Используй ответственно 😌</p>
+    <!-- История / избранное / статистика -->
+    <aside class="panel side" aria-label="История и статистика">
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tabHistory" role="tab" aria-selected="true" type="button">История</button>
+        <button class="tab" id="tabFavorites" role="tab" aria-selected="false" type="button">Избранное</button>
+        <button class="tab" id="tabBase" role="tab" aria-selected="false" type="button">База</button>
+        <button class="tab" id="tabStats" role="tab" aria-selected="false" type="button">Статистика</button>
+      </div>
+      <div class="list" id="listHistory"></div>
+      <div class="list" id="listFavorites" hidden></div>
+      <div id="viewBase" hidden>
+        <div class="search-field">
+          <span class="ico" aria-hidden="true">🔍</span>
+          <input id="baseSearch" type="search" placeholder="Найти в базе оправданий…" aria-label="Поиск по базе оправданий" autocomplete="off" />
+        </div>
+        <p class="search-count" id="searchCount">В базе 456 оправданий — введи запрос</p>
+        <div class="list" id="listBase"></div>
+      </div>
+      <div class="list" id="listStats" hidden></div>
+      <div class="list-footer"><button class="link-btn danger" id="clearList" type="button">Очистить раздел</button></div>
+    </aside>
+  </main>
 </div>
 
-<script>
-const low = [
-    "Меня задержал говорящий голубь",
-    "Поймал метеорит в огороде",
-    "Соседка украла мою тапочку",
-    "Нашел дверь в параллельную вселенную",
-    "Меня похитили инопланетяне на 5 минут"
-];
-
-const medium = [
-    "Сломался лифт",
-    "Забыл выключить утюг",
-    "Пропал свет в подъезде",
-    "Потерял ключи",
-    "Застрял в навигаторе"
-];
-
-const high = [
-    "Задержался на работе",
-    "Пробки на дорогах",
-    "Плохое самочувствие",
-    "Технические неполадки",
-    "Семейные обстоятельства"
-];
-
-const slider = document.getElementById('credibility');
-const credValue = document.getElementById('credValue');
-const oracle = document.getElementById('oracle');
-const loading = document.getElementById('loading');
-const excuseBox = document.getElementById('excuseBox');
-const excuseText = document.getElementById('excuseText');
-const reset = document.getElementById('reset');
-
-slider.oninput = () => credValue.textContent = slider.value;
-
-oracle.onclick = () => {
-    oracle.disabled = true;
-    loading.style.display = 'block';
-    excuseBox.style.display = 'none';
-
-    setTimeout(() => {
-        let pool =
-            slider.value < 30 ? low :
-            slider.value < 70 ? medium : high;
-
-        excuseText.textContent = `"${pool[Math.floor(Math.random() * pool.length)]}"`;
-        excuseBox.style.display = 'block';
-        reset.style.display = 'inline';
-        loading.style.display = 'none';
-        oracle.disabled = false;
-    }, 800);
-};
-
-reset.onclick = () => {
-    excuseBox.style.display = 'none';
-    reset.style.display = 'none';
-};
-</script>
-
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
